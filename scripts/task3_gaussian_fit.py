@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 
-from common import NEURON, STIM_MS, load_df, save, tuning_stats
+from common import NEURON, RATE_LABEL, load_df, neuron_data, save, tuning_stats
 from task2_polynomial_fits import GRID_POINTS, fit_polynomials
 
 SIGMA_GUESS_DEG = 30
@@ -21,12 +21,9 @@ def fit_gaussian(theta, r, ori, mean_r):
 
 
 def main():
-    df = load_df()
+    df = load_df(rate=True)
     tuning, sem = tuning_stats(df)
-    theta = df["orientation"].to_numpy()
-    r = df[NEURON].to_numpy()
-    ori = tuning.index.to_numpy()
-    mean_r = tuning[NEURON].to_numpy()
+    theta, r, ori, mean_r = neuron_data(df, tuning, NEURON)
     theta_grid = np.linspace(ori.min(), ori.max(), GRID_POINTS)
 
     fits, mse_table = fit_polynomials(theta, r, ori, mean_r)
@@ -52,7 +49,7 @@ def main():
     ax.annotate(f"B = {B:.1f}", (ori.min(), B), xytext=(4, 4), textcoords="offset points", color="tab:purple")
     ax.set_xticks(ori, [f"{o:g}°" for o in ori])
     ax.set_xlabel("orientation (deg)")
-    ax.set_ylabel(f"mean spikes / {STIM_MS} ms")
+    ax.set_ylabel(RATE_LABEL)
     ax.set_title(f"{NEURON}: Gaussian fit vs polynomials")
     ax.legend()
     plt.tight_layout()
