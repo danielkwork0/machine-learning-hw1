@@ -9,6 +9,7 @@ from task3_gaussian_fit import fit_gaussian, gaussian
 NEURONS = [BOUNDARY_NEURON, NEURON]
 PERIOD_DEG = 180
 KAPPA_GUESS = 2
+MAX_FEV = 20000
 
 
 def von_mises(theta, B, A, mu, kappa):
@@ -17,7 +18,7 @@ def von_mises(theta, B, A, mu, kappa):
 
 def fit_von_mises(theta, r, ori, mean_r):
     p0 = [mean_r.min(), np.ptp(mean_r) / (np.exp(KAPPA_GUESS) - np.exp(-KAPPA_GUESS)), ori[mean_r.argmax()], KAPPA_GUESS]
-    params, cov = curve_fit(von_mises, theta, r, p0=p0)
+    params, cov = curve_fit(von_mises, theta, r, p0=p0, maxfev=MAX_FEV)
     params[2] %= PERIOD_DEG
     return params, np.sqrt(np.diag(cov))
 
